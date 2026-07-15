@@ -1,8 +1,6 @@
 # Router-1x3
 
-```{=html}
-<p align="center">
-```
+
 ## Verilog RTL Design & Functional Verification
 
 ![Verilog](https://img.shields.io/badge/HDL-Verilog-blue)
