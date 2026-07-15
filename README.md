@@ -55,8 +55,6 @@ verification**, and **ModelSim waveform analysis**.
 > -   Functional Verification
 > -   Waveform Validation
 >
-> This repository does **not** include FPGA implementation, synthesis,
-> timing analysis, or ASIC physical design.
 
 ------------------------------------------------------------------------
 
