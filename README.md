@@ -923,3 +923,437 @@ This mechanism allows inactive FIFOs to be safely cleared without affecting the 
 | Soft Reset | Supported |
 | Full Detection | Supported |
 | Empty Detection | Supported |
+# RTL Design (RTL Viewer)
+
+The synthesized RTL hierarchy generated using **Intel Quartus Prime RTL Viewer** provides a structural representation of the Router 1×3 architecture. Unlike the behavioral RTL source code, the RTL Viewer illustrates how the design is interpreted by the synthesis tool and how individual modules are interconnected to form the complete hardware architecture.
+
+The synthesized design confirms that the Router 1×3 has been implemented using a modular hierarchical approach, where each functional block performs a dedicated operation within the routing process. This modular organization improves readability, simplifies debugging, and enables each hardware block to be verified independently before integration.
+
+<p align="center">
+<img src="RTL_Viewer/router_rtl_viewer.png" width="900">
+</p>
+
+<p align="center">
+<b>Figure 1.</b> Synthesized RTL hierarchy of the Router 1×3
+</p>
+
+---
+
+## RTL Hierarchy
+
+The RTL Viewer shows the following major hardware blocks.
+
+```
+                    Router 1×3
+
+                        │
+
+      ┌─────────────────┼──────────────────┐
+
+      │                 │                  │
+
+     FSM            Register         Synchronizer
+
+                                            │
+
+                        ┌───────────┬───────────┬───────────┐
+
+                        │           │           │
+
+                     FIFO0       FIFO1       FIFO2
+```
+
+Each module performs a dedicated function within the overall routing process.
+
+---
+
+## RTL Architecture Analysis
+
+### FSM
+
+The FSM appears as an independent control block connected to the Register and Synchronizer modules.
+
+Its outputs generate all control signals required for packet reception, including:
+
+- detect_add
+- ld_state
+- laf_state
+- lfd_state
+- write_enb_reg
+- busy
+- rst_int_reg
+
+The RTL hierarchy confirms that the controller is completely separated from the datapath.
+
+---
+
+### Register
+
+The Register module receives the incoming packet directly from the input interface.
+
+Its outputs connect to:
+
+- Synchronizer
+- FIFO Data Inputs
+- Error Output
+
+The RTL hierarchy clearly shows that packet formatting and parity generation are isolated within this module.
+
+---
+
+### Synchronizer
+
+The Synchronizer acts as the interface between the controller and the three FIFOs.
+
+Its synthesized outputs include:
+
+- write_enb[2:0]
+- fifo_full
+- soft_reset_0
+- soft_reset_1
+- soft_reset_2
+- vld_out_0
+- vld_out_1
+- vld_out_2
+
+This confirms that FIFO selection is performed centrally rather than individually inside each FIFO.
+
+---
+
+### FIFOs
+
+The RTL Viewer shows three independent FIFO instances.
+
+Each FIFO receives
+
+- Data
+- Write Enable
+- Read Enable
+- Soft Reset
+
+and independently generates
+
+- Data Output
+- Full Flag
+- Empty Flag
+
+The hierarchical organization confirms that each output port possesses an independent packet buffer.
+
+---
+
+## Design Hierarchy
+
+The synthesized hierarchy verifies that the Router 1×3 has been implemented using a clean modular design methodology.
+
+Advantages include:
+
+- Easy module reuse
+- Independent module simulation
+- Simplified debugging
+- Improved maintainability
+- Clear separation between datapath and controller
+
+---
+
+# Simulation and Waveform Analysis
+
+The Router 1×3 RTL design was simulated using **ModelSim**. The correctness of each module was analyzed by observing the generated simulation waveforms and monitoring both internal and external signals.
+
+The objective of the simulation was to verify that every module behaved according to the intended RTL design and that the integrated router successfully transferred packets from the input interface to the selected output FIFO.
+
+The simulation process consisted of two stages.
+
+- Individual module simulation
+- Top-level integrated simulation
+
+Each module was first simulated independently to verify its internal functionality before being integrated into the complete router.
+
+---
+
+# FIFO Waveform Analysis
+
+<p align="center">
+<img src="Waveforms/fifo_waveform.png" width="900">
+</p>
+
+The FIFO module was simulated independently to verify correct packet storage and retrieval.
+
+The waveform demonstrates the complete FIFO operation, including reset initialization, write operations, read operations, pointer movement, occupancy count, and status flag generation.
+
+---
+
+## Signals Observed
+
+- clock
+- resetn
+- soft_reset
+- write_enb
+- read_enb
+- data_in
+- data_out
+- full
+- empty
+- write_ptr
+- read_ptr
+- count
+
+---
+
+## Waveform Observations
+
+The waveform confirms the following behavior.
+
+- FIFO initializes correctly after reset.
+- Empty flag is asserted after reset.
+- Incoming data is written only when write enable is asserted.
+- Write pointer increments after every successful write.
+- FIFO memory stores packet data sequentially.
+- Read pointer increments after every successful read.
+- Output data follows FIFO ordering.
+- Counter correctly tracks FIFO occupancy.
+- Empty flag asserts after all stored data has been read.
+- Soft reset clears the FIFO memory and resets internal pointers.
+
+The observed waveform confirms correct FIFO functionality.
+
+---
+
+# FSM Waveform Analysis
+
+<p align="center">
+<img src="Waveforms/fsm_waveform.png" width="900">
+</p>
+
+The FSM waveform demonstrates the operation of the router controller throughout packet reception.
+
+The controller transitions through different routing states depending on packet status and FIFO conditions.
+
+---
+
+## Signals Observed
+
+- state
+- next_state
+- busy
+- detect_add
+- ld_state
+- laf_state
+- lfd_state
+- write_enb_reg
+- rst_int_reg
+- fifo_full
+- pkt_valid
+
+---
+
+## Waveform Observations
+
+The waveform confirms that:
+
+- The controller initializes correctly after reset.
+- A valid packet causes transition from DETECT_ADDRESS to LOAD_FIRST_DATA.
+- Payload bytes are accepted while the FSM remains in LOAD_DATA.
+- FIFO full conditions force the FSM into FIFO_FULL_STATE.
+- Packet reception resumes through LOAD_AFTER_FULL.
+- The parity byte is accepted in LOAD_PARITY.
+- The controller compares parity values in CHECK_PARITY_ERROR.
+- The FSM returns to DETECT_ADDRESS after packet completion.
+
+The observed state transitions match the intended packet reception sequence.
+
+---
+
+# Register Waveform Analysis
+
+<p align="center">
+<img src="Waveforms/register_waveform.png" width="900">
+</p>
+
+The Register module waveform verifies packet storage and parity generation.
+
+---
+
+## Signals Observed
+
+- header_reg
+- fifo_full_reg
+- internal_parity_reg
+- parity_reg
+- dout
+- parity_done
+- low_pkt_valid
+- err
+
+---
+
+## Waveform Observations
+
+The waveform demonstrates that:
+
+- Header byte is captured correctly.
+- Payload bytes are forwarded sequentially.
+- Internal parity is generated continuously.
+- Received parity byte is stored.
+- Parity comparison occurs after packet completion.
+- Error signal remains LOW for correct packets.
+- Buffered data is retained during FIFO full conditions.
+- Packet transmission resumes correctly after FIFO availability.
+
+The Register module performs both packet buffering and parity verification as intended.
+
+---
+
+# Synchronizer Waveform Analysis
+
+<p align="center">
+<img src="Waveforms/synchronizer_waveform.png" width="900">
+</p>
+
+The Synchronizer waveform verifies destination decoding and FIFO selection.
+
+---
+
+## Signals Observed
+
+- write_enb
+- fifo_full
+- vld_out_0
+- vld_out_1
+- vld_out_2
+- soft_reset_0
+- soft_reset_1
+- soft_reset_2
+
+---
+
+## Waveform Observations
+
+The waveform confirms:
+
+- Destination address is decoded correctly.
+- Only one FIFO write enable is active during packet transfer.
+- Valid output is generated for the selected FIFO.
+- FIFO full status is correctly reported.
+- Soft reset signals are generated independently.
+- FIFO selection changes according to the destination address.
+
+This confirms proper routing control between the controller and the FIFOs.
+
+---
+
+# Top-Level Waveform Analysis (Normal Packet Transfer)
+
+<p align="center">
+<img src="Waveforms/top_normal.png" width="900">
+</p>
+
+The complete Router 1×3 was simulated to verify packet transfer through the integrated design.
+
+This simulation demonstrates the interaction between all internal modules during a normal packet transmission.
+
+---
+
+## Signals Observed
+
+- data_in
+- pkt_valid
+- busy
+- data_out_0
+- data_out_1
+- data_out_2
+- write_enb
+- FSM states
+- FIFO pointers
+- FIFO memory
+- header register
+- parity register
+
+---
+
+## Waveform Observations
+
+The waveform shows the complete packet routing sequence.
+
+- Packet header is received.
+- Destination address is decoded.
+- Payload length is extracted.
+- FSM begins packet reception.
+- Register stores packet bytes.
+- Synchronizer enables the selected FIFO.
+- FIFO stores incoming data.
+- Output data becomes available after read enable.
+- Packet ordering is preserved.
+- No parity error is generated.
+- FSM returns to the idle state after packet completion.
+
+The integrated simulation confirms correct interaction between all modules.
+
+---
+
+# Top-Level Waveform Analysis (Corner Cases)
+
+<p align="center">
+<img src="Waveforms/top_corner_cases.png" width="900">
+</p>
+
+A dedicated simulation was performed to observe router behavior under multiple operating scenarios beyond a single packet transfer.
+
+The purpose of this simulation was to confirm that the router continues to operate correctly during extended packet transmissions and changing routing conditions.
+
+---
+
+## Waveform Observations
+
+The corner-case simulation demonstrates:
+
+- Multiple packets transmitted sequentially.
+- Different destination addresses selected correctly.
+- Packet routing to FIFO0, FIFO1, and FIFO2.
+- Continuous packet reception without requiring reset.
+- FIFO memory updated correctly for successive packets.
+- Read and write pointers operate correctly throughout the simulation.
+- Valid output signals generated for the selected destination.
+- FSM repeatedly returns to the idle state after each packet.
+- Internal control signals remain synchronized with packet transmission.
+- Packet ordering is preserved throughout multiple transactions.
+
+The waveform confirms stable operation of the integrated Router 1×3 under extended simulation conditions.
+
+---
+
+## Simulation Summary
+
+| Module | Simulation Purpose | Status |
+|----------|-------------------|--------|
+| FIFO | Verify storage, read/write operations, status flags, and pointer updates | ✅ Verified through waveform analysis |
+| FSM | Verify state transitions and control signal generation | ✅ Verified through waveform analysis |
+| Register | Verify packet buffering, parity generation, and error detection | ✅ Verified through waveform analysis |
+| Synchronizer | Verify destination decoding, FIFO selection, and soft reset generation | ✅ Verified through waveform analysis |
+| Top Module (Normal Case) | Verify integrated packet routing through all modules | ✅ Verified through waveform analysis |
+| Top Module (Corner Cases) | Verify router operation under multiple packet transfer scenarios | ✅ Verified through waveform analysis |
+# Author
+
+**VELMURUGAN R**
+---
+# Conclusion
+
+The **Router 1×3** project demonstrates the implementation of a packet-based routing architecture using a modular Register Transfer Level (RTL) design methodology in **Verilog HDL**. The design successfully routes incoming packets from a single input interface to one of three independent output ports based on the destination address contained within the packet header.
+
+The architecture is composed of four major functional modules—**FSM**, **Register**, **Synchronizer**, and **FIFO**—each performing a dedicated role in packet reception, routing, buffering, and error detection. The separation of control logic from the datapath results in a clean, maintainable, and reusable hardware architecture that simplifies both development and debugging.
+
+Simulation was carried out using **ModelSim**, where the behavior of every individual module, as well as the complete integrated router, was analyzed through simulation waveforms. The observed waveforms verified correct packet reception, destination decoding, FIFO selection, packet buffering, parity generation, parity comparison, FIFO control, and overall packet routing behavior under both normal operating conditions and additional routing scenarios.
+
+RTL synthesis was completed using **Intel Quartus Prime**, and the generated RTL Viewer confirmed the hierarchical organization of the design and the correct interconnection between all functional modules. The synthesized structure closely matches the intended RTL architecture, demonstrating that the design is fully synthesizable and organized using a modular hardware design approach.
+
+Overall, this project provided practical experience in several important aspects of digital system design, including:
+
+- Modular RTL Design
+- Finite State Machine (FSM) Design
+- FIFO-Based Memory Architecture
+- Packet-Based Data Communication
+- Parity Generation and Error Detection
+- Control Path and Data Path Design
+- Simulation Waveform Analysis
+- RTL Synthesis and Hardware Hierarchy Visualization
+
+The Router 1×3 serves as a comprehensive digital design project that integrates multiple fundamental hardware concepts into a single system. It represents a strong foundation for understanding packet routing architectures and demonstrates practical RTL design techniques commonly applied in FPGA and digital hardware development.
