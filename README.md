@@ -1,110 +1,52 @@
-
-# Router 1×3 (Verilog HDL)
+# Router 1×3 using Verilog HDL
 
 ## Overview
-This project implements a 1×3 packet router in Verilog HDL. It receives packets from a single input and routes them to one of three output FIFOs based on the destination address contained in the packet header.
 
-## Features
-- 1 Input → 3 Outputs
-- FSM-based controller
-- Register block
-- Synchronizer
-- Three FIFOs
-- Parity generation and checking
-- Busy signal
-- FIFO full/empty handling
-- Soft reset support
-
-## Packet Format
-| Field | Description |
-|------|-------------|
-| Header | Destination + Length |
-| Payload | User Data |
-| Parity | Error Detection |
-
-Destination:
-- 00 → FIFO0
-- 01 → FIFO1
-- 10 → FIFO2
+This project implements a 1×3 packet router in Verilog HDL. It routes
+packets from a single input interface to one of three output FIFOs based
+on the destination address in the packet header.
 
 ## Architecture
-```
-Input
-  │
-Register
-  │
- FSM
-  │
-Synchronizer
- ├── FIFO0
- ├── FIFO1
- └── FIFO2
-```
 
-## Modules
-### FSM
-Controls packet flow through Detect Address, Load First Data, Load Data, FIFO Full, Load After Full, Load Parity and Check Parity Error states.
+Insert the RTL architecture image here.
 
-### Register
-Stores header, payload, parity and performs parity checking.
+Major modules: - FSM - Register - Synchronizer - FIFO_0 - FIFO_1 -
+FIFO_2
 
-### Synchronizer
-Selects the destination FIFO, generates write enables, valid outputs and soft resets.
+## Packet Format
 
-### FIFO
-Each FIFO contains memory, read pointer, write pointer, empty flag and full flag.
+  Byte      Description
+  --------- --------------------------------------
+  Header    Destination Address + Payload Length
+  Payload   User Data
+  Parity    XOR(Header + Payload)
 
-## Inputs
-- clock
-- resetn
-- pkt_valid
-- data_in[7:0]
-- read_enb_0
-- read_enb_1
-- read_enb_2
+Header: - Bits\[7:6\] : Destination Address - Bits\[5:0\] : Payload
+Length
 
-## Outputs
-- data_out_0
-- data_out_1
-- data_out_2
-- vld_out_0
-- vld_out_1
-- vld_out_2
-- busy
-- err
+DA: - 00 -\> FIFO0 - 01 -\> FIFO1 - 10 -\> FIFO2
 
-## Verification
-The design was verified using:
-- Normal packet transfer
-- Continuous packets
-- Multiple packets
-- FIFO full
-- FIFO empty
-- Soft reset
-- Parity error
-- Back-to-back packets
+## Router FSM
 
-## Tools
-- Verilog HDL
-- ModelSim
-- Quartus Prime RTL Viewer
+Controls packet reception, loading, FIFO-full handling, parity
+processing and state transitions.
 
-## Folder Structure
-```
-Router-1x3/
-├── RTL/
-├── Testbench/
-├── Simulation/
-├── Waveforms/
-├── RTL_Viewer/
-└── README.md
-```
+## Router Register
 
-## Future Work
-- AXI interface
-- UVM verification
-- SystemVerilog Assertions
-- Parameterized FIFO depth
+Stores header and payload bytes, generates parity, compares received
+parity and asserts error.
 
-## Conclusion
-The Router 1×3 successfully routes packets to the selected output FIFO with parity protection, buffering, and FSM-controlled operation.
+## Synchronizer
+
+Decodes destination address, selects FIFO, generates write enables,
+valid outputs and soft resets.
+
+## FIFOs
+
+Three independent FIFOs buffer packets for each output channel with
+full/empty detection.
+
+## Data Flow
+
+Input -\> Register -\> FSM -\> Synchronizer -\> FIFO0/FIFO1/FIFO2 -\>
+Outputs
