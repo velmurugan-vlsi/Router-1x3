@@ -1,7 +1,7 @@
 # Router-1x3
 
 
-## Verilog RTL Design & Functional Verification
+## Verilog RTL Design , RTL Verification , Waveform Validation
 
 ![Verilog](https://img.shields.io/badge/HDL-Verilog-blue)
 ![Simulation](https://img.shields.io/badge/Simulation-ModelSim-success)
