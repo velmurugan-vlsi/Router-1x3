@@ -49,12 +49,6 @@ The design was verified completely through **module-level
 verification**, **top-level functional verification**, **corner-case
 verification**, and **ModelSim waveform analysis**.
 
-> **Scope**
->
-> -   RTL Design
-> -   Functional Verification
-> -   Waveform Validation
->
 
 ------------------------------------------------------------------------
 
