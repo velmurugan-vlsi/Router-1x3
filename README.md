@@ -1,153 +1,201 @@
 # Router-1x3
 
+::: {align="center"}
+# Router-1x3
 
-## Verilog RTL Design , RTL Verification , Waveform Validation
+### Verilog RTL Design • RTL Verification • RTL Synthesis • Waveform Validation
 
 ![Verilog](https://img.shields.io/badge/HDL-Verilog-blue)
 ![Simulation](https://img.shields.io/badge/Simulation-ModelSim-success)
-![Status](https://img.shields.io/badge/Verification-Completed-brightgreen)
-
-```{=html}
-</p>
-```
+![Synthesis](https://img.shields.io/badge/Synthesis-Quartus_Prime-orange)
+![Status](https://img.shields.io/badge/RTL-Verified-brightgreen)
+:::
 
 ------------------------------------------------------------------------
 
-## Overview
+# Overview
 
-**Router-1x3** is a modular Verilog RTL implementation of a **1×3 packet
-router**. The router forwards packets to one of three output FIFOs
-according to the destination address encoded in the packet header.
+**Router-1x3** is a Verilog RTL implementation of a packet router that
+accepts packets from a single source interface and forwards them to one
+of three destination FIFOs. The destination is selected using the two
+least significant bits of the packet header.
 
-The project focuses on **RTL Design** and **Functional Verification**
-using directed testbenches and waveform analysis.
-
-------------------------------------------------------------------------
-
-## Features
-
--   Modular RTL Architecture
--   Three Independent Output FIFOs
--   FSM-Based Packet Control
--   Header Decoding
--   Packet Routing
--   Internal Parity Generation
--   Parity Error Detection
--   FIFO Full Handling
--   WAIT_TILL_EMPTY State
--   LOAD_AFTER_FULL State
--   Soft Reset Mechanism
--   Timeout Handling
+The project includes RTL design, module-level verification, top-level
+verification, RTL synthesis using Intel Quartus Prime, and validation
+through ModelSim waveform analysis.
 
 ------------------------------------------------------------------------
 
-## Architecture
+# Router Architecture
 
-> Replace with the final architecture diagram.
+> Replace this placeholder with the final architecture diagram.
 
 ![Architecture](images/architecture.png)
 
 ------------------------------------------------------------------------
 
-## Packet Format
+# Packet Format
 
-  Bits      Description
-  --------- ---------------------
-  \[7:2\]   Payload Length
-  \[1:0\]   Destination Address
+Each packet consists of three parts:
 
-  Destination   FIFO
-  ------------- -------
-  00            FIFO0
-  01            FIFO1
-  10            FIFO2
+  Field         Description
+  ------------- ------------------------------------------------------
+  **Header**    Contains the payload length and destination address.
+  **Payload**   User data transferred through the selected FIFO.
+  **Parity**    Used to detect transmission errors.
+
+### Header Format
+
+      Bits      Field
+  ------------- ---------------------
+   **\[7:2\]**  Payload Length
+   **\[1:0\]**  Destination Address
+
+### Destination Address Mapping
+
+   Address  Selected FIFO
+  --------- ---------------
+   `2'b00`  FIFO0
+   `2'b01`  FIFO1
+   `2'b10`  FIFO2
 
 ------------------------------------------------------------------------
 
-## RTL Modules
+# RTL Modules
 
-  Module         Responsibility
-  -------------- -----------------------------------
-  FSM            Packet flow control
-  Register       Header, parity and error handling
-  Synchronizer   FIFO selection and soft reset
-  FIFO           Packet buffering
-  Top            RTL integration
+  -----------------------------------------------------------------------
+  Module                          Function
+  ------------------------------- ---------------------------------------
+  **FSM**                         Controls packet flow and generates all
+                                  control signals.
+
+  **Register**                    Stores header information, generates
+                                  parity, compares received parity and
+                                  reports errors.
+
+  **Synchronizer**                Decodes destination address, selects
+                                  the output FIFO, generates write enable
+                                  signals and soft resets.
+
+  **FIFO (3x)**                   Buffers packets independently for each
+                                  output port.
+
+  **Top Module**                  Integrates all RTL modules into the
+                                  complete Router-1x3 design.
+  -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
-## Verification
+# Verification
 
-### Module-Level
+## Module-Level Verification
 
--   FIFO Testbench
--   FSM Testbench
--   Register Testbench
--   Synchronizer Testbench
+Dedicated testbenches were developed for:
 
-### Top-Level Functional
+-   FIFO
+-   FSM
+-   Register
+-   Synchronizer
 
--   Packet Routing
--   FIFO Selection
--   Payload Transfer
--   Correct Parity
+Each module was verified independently before top-level integration.
 
-### Corner Cases
+### Top-Level Verification
+
+Two independent testbenches were used.
+
+**Functional Testbench**
+
+-   Packet routing
+-   FIFO selection
+-   Payload transfer
+-   Correct parity handling
+-   Packet read operation
+
+**Corner-Case Testbench**
 
 -   FIFO Full
 -   WAIT_TILL_EMPTY
 -   LOAD_AFTER_FULL
--   Reset During Packet
--   Reset During FIFO Full
+-   Reset during packet processing
+-   Reset during FIFO full
+-   Soft reset timeout
+-   FIFO wrap-around
+-   Simultaneous read/write
+-   Read while write
+-   Back-to-back packets
+-   Protocol robustness (`pkt_valid`)
+
+------------------------------------------------------------------------
+
+# Verification Summary
+
+  Test Case                  Status
+  ------------------------- --------
+  FIFO0 Routing                ✅
+  FIFO1 Routing                ✅
+  FIFO2 Routing                ✅
+  Correct Parity               ✅
+  Parity Error Detection       ✅
+  FIFO Full                    ✅
+  WAIT_TILL_EMPTY              ✅
+  LOAD_AFTER_FULL              ✅
+  Reset During Packet          ✅
+  Reset During FIFO Full       ✅
+  Soft Reset Timeout           ✅
+  Simultaneous Read/Write      ✅
+  FIFO Wrap-Around             ✅
+  Read While Write             ✅
+  Protocol Robustness          ✅
+
+------------------------------------------------------------------------
+
+# RTL Synthesis
+
+The RTL design was synthesized using **Intel Quartus Prime**.
+
+Synthesis was used to:
+
+-   Verify synthesizability of the RTL
+-   Generate RTL Netlist
+-   Generate Technology Netlist
+-   Validate hardware connectivity after synthesis
+
+> FPGA implementation and on-board hardware validation were not
+> performed.
+
+------------------------------------------------------------------------
+
+# Waveform Validation
+
+RTL behavior was validated using ModelSim waveforms for:
+
+-   Normal Packet Transfer
+-   FIFO Full
+-   WAIT_TILL_EMPTY
+-   LOAD_AFTER_FULL
+-   Parity Error
+-   Reset Scenarios
 -   Soft Reset Timeout
 -   FIFO Wrap-Around
--   Simultaneous Read / Write
--   Read While Writing
--   Back-to-Back Packets
--   Illegal `pkt_valid`
+-   Simultaneous Read/Write
 
 ------------------------------------------------------------------------
 
-## Verification Summary
+# Tools
 
-  Test                         Status
-  --------------------------- --------
-  FIFO0 Routing                  ✅
-  FIFO1 Routing                  ✅
-  FIFO2 Routing                  ✅
-  Correct Parity                 ✅
-  Parity Error                   ✅
-  FIFO Full                      ✅
-  WAIT_TILL_EMPTY                ✅
-  LOAD_AFTER_FULL                ✅
-  Reset During Packet            ✅
-  Reset During FIFO Full         ✅
-  Timeout                        ✅
-  Simultaneous Read / Write      ✅
-  FIFO Wrap-Around               ✅
-  Read While Writing             ✅
-  Protocol Robustness            ✅
+  Tool                  Purpose
+  --------------------- ------------------------------------
+  Verilog HDL           RTL Design
+  Visual Studio Code    Code Development
+  ModelSim              RTL Simulation & Waveform Analysis
+  Intel Quartus Prime   RTL Synthesis & Netlist Generation
 
 ------------------------------------------------------------------------
 
-## Waveforms
-
-ModelSim waveforms were captured for: - Normal Packet - FIFO Full -
-WAIT_TILL_EMPTY - LOAD_AFTER_FULL - Parity Error - Timeout - Reset
-During Packet - FIFO Wrap-Around - Simultaneous Read / Write
-
-------------------------------------------------------------------------
-
-## Tools
-
-  Tool                 Usage
-  -------------------- --------------------------------
-  Verilog HDL          RTL Design
-  ModelSim             Simulation & Waveform Analysis
-  Visual Studio Code   Code Editing
-
-------------------------------------------------------------------------
-
-## Author
+# Author
 
 **VELMURUGAN R**
+
+Electronics and Communication Engineering Student
+
+Aspiring Design Verification Engineer
