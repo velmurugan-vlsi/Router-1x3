@@ -1,201 +1,110 @@
-# Router-1x3
 
-::: {align="center"}
-# Router-1x3
+# Router 1×3 (Verilog HDL)
 
-### Verilog RTL Design • RTL Verification • RTL Synthesis • Waveform Validation
+## Overview
+This project implements a 1×3 packet router in Verilog HDL. It receives packets from a single input and routes them to one of three output FIFOs based on the destination address contained in the packet header.
 
-![Verilog](https://img.shields.io/badge/HDL-Verilog-blue)
-![Simulation](https://img.shields.io/badge/Simulation-ModelSim-success)
-![Synthesis](https://img.shields.io/badge/Synthesis-Quartus_Prime-orange)
-![Status](https://img.shields.io/badge/RTL-Verified-brightgreen)
-:::
+## Features
+- 1 Input → 3 Outputs
+- FSM-based controller
+- Register block
+- Synchronizer
+- Three FIFOs
+- Parity generation and checking
+- Busy signal
+- FIFO full/empty handling
+- Soft reset support
 
-------------------------------------------------------------------------
+## Packet Format
+| Field | Description |
+|------|-------------|
+| Header | Destination + Length |
+| Payload | User Data |
+| Parity | Error Detection |
 
-# Overview
+Destination:
+- 00 → FIFO0
+- 01 → FIFO1
+- 10 → FIFO2
 
-**Router-1x3** is a Verilog RTL implementation of a packet router that
-accepts packets from a single source interface and forwards them to one
-of three destination FIFOs. The destination is selected using the two
-least significant bits of the packet header.
+## Architecture
+```
+Input
+  │
+Register
+  │
+ FSM
+  │
+Synchronizer
+ ├── FIFO0
+ ├── FIFO1
+ └── FIFO2
+```
 
-The project includes RTL design, module-level verification, top-level
-verification, RTL synthesis using Intel Quartus Prime, and validation
-through ModelSim waveform analysis.
+## Modules
+### FSM
+Controls packet flow through Detect Address, Load First Data, Load Data, FIFO Full, Load After Full, Load Parity and Check Parity Error states.
 
-------------------------------------------------------------------------
+### Register
+Stores header, payload, parity and performs parity checking.
 
-# Router Architecture
+### Synchronizer
+Selects the destination FIFO, generates write enables, valid outputs and soft resets.
 
-> Replace this placeholder with the final architecture diagram.
+### FIFO
+Each FIFO contains memory, read pointer, write pointer, empty flag and full flag.
 
-![Architecture](images/architecture.png)
+## Inputs
+- clock
+- resetn
+- pkt_valid
+- data_in[7:0]
+- read_enb_0
+- read_enb_1
+- read_enb_2
 
-------------------------------------------------------------------------
+## Outputs
+- data_out_0
+- data_out_1
+- data_out_2
+- vld_out_0
+- vld_out_1
+- vld_out_2
+- busy
+- err
 
-# Packet Format
+## Verification
+The design was verified using:
+- Normal packet transfer
+- Continuous packets
+- Multiple packets
+- FIFO full
+- FIFO empty
+- Soft reset
+- Parity error
+- Back-to-back packets
 
-Each packet consists of three parts:
+## Tools
+- Verilog HDL
+- ModelSim
+- Quartus Prime RTL Viewer
 
-  Field         Description
-  ------------- ------------------------------------------------------
-  **Header**    Contains the payload length and destination address.
-  **Payload**   User data transferred through the selected FIFO.
-  **Parity**    Used to detect transmission errors.
+## Folder Structure
+```
+Router-1x3/
+├── RTL/
+├── Testbench/
+├── Simulation/
+├── Waveforms/
+├── RTL_Viewer/
+└── README.md
+```
 
-### Header Format
+## Future Work
+- AXI interface
+- UVM verification
+- SystemVerilog Assertions
+- Parameterized FIFO depth
 
-      Bits      Field
-  ------------- ---------------------
-   **\[7:2\]**  Payload Length
-   **\[1:0\]**  Destination Address
-
-### Destination Address Mapping
-
-   Address  Selected FIFO
-  --------- ---------------
-   `2'b00`  FIFO0
-   `2'b01`  FIFO1
-   `2'b10`  FIFO2
-
-------------------------------------------------------------------------
-
-# RTL Modules
-
-  -----------------------------------------------------------------------
-  Module                          Function
-  ------------------------------- ---------------------------------------
-  **FSM**                         Controls packet flow and generates all
-                                  control signals.
-
-  **Register**                    Stores header information, generates
-                                  parity, compares received parity and
-                                  reports errors.
-
-  **Synchronizer**                Decodes destination address, selects
-                                  the output FIFO, generates write enable
-                                  signals and soft resets.
-
-  **FIFO (3x)**                   Buffers packets independently for each
-                                  output port.
-
-  **Top Module**                  Integrates all RTL modules into the
-                                  complete Router-1x3 design.
-  -----------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
-# Verification
-
-## Module-Level Verification
-
-Dedicated testbenches were developed for:
-
--   FIFO
--   FSM
--   Register
--   Synchronizer
-
-Each module was verified independently before top-level integration.
-
-### Top-Level Verification
-
-Two independent testbenches were used.
-
-**Functional Testbench**
-
--   Packet routing
--   FIFO selection
--   Payload transfer
--   Correct parity handling
--   Packet read operation
-
-**Corner-Case Testbench**
-
--   FIFO Full
--   WAIT_TILL_EMPTY
--   LOAD_AFTER_FULL
--   Reset during packet processing
--   Reset during FIFO full
--   Soft reset timeout
--   FIFO wrap-around
--   Simultaneous read/write
--   Read while write
--   Back-to-back packets
--   Protocol robustness (`pkt_valid`)
-
-------------------------------------------------------------------------
-
-# Verification Summary
-
-  Test Case                  Status
-  ------------------------- --------
-  FIFO0 Routing                ✅
-  FIFO1 Routing                ✅
-  FIFO2 Routing                ✅
-  Correct Parity               ✅
-  Parity Error Detection       ✅
-  FIFO Full                    ✅
-  WAIT_TILL_EMPTY              ✅
-  LOAD_AFTER_FULL              ✅
-  Reset During Packet          ✅
-  Reset During FIFO Full       ✅
-  Soft Reset Timeout           ✅
-  Simultaneous Read/Write      ✅
-  FIFO Wrap-Around             ✅
-  Read While Write             ✅
-  Protocol Robustness          ✅
-
-------------------------------------------------------------------------
-
-# RTL Synthesis
-
-The RTL design was synthesized using **Intel Quartus Prime**.
-
-Synthesis was used to:
-
--   Verify synthesizability of the RTL
--   Generate RTL Netlist
--   Generate Technology Netlist
--   Validate hardware connectivity after synthesis
-
-> FPGA implementation and on-board hardware validation were not
-> performed.
-
-------------------------------------------------------------------------
-
-# Waveform Validation
-
-RTL behavior was validated using ModelSim waveforms for:
-
--   Normal Packet Transfer
--   FIFO Full
--   WAIT_TILL_EMPTY
--   LOAD_AFTER_FULL
--   Parity Error
--   Reset Scenarios
--   Soft Reset Timeout
--   FIFO Wrap-Around
--   Simultaneous Read/Write
-
-------------------------------------------------------------------------
-
-# Tools
-
-  Tool                  Purpose
-  --------------------- ------------------------------------
-  Verilog HDL           RTL Design
-  Visual Studio Code    Code Development
-  ModelSim              RTL Simulation & Waveform Analysis
-  Intel Quartus Prime   RTL Synthesis & Netlist Generation
-
-------------------------------------------------------------------------
-
-# Author
-
-**VELMURUGAN R**
-
-Electronics and Communication Engineering Student
-
-Aspiring Design Verification Engineer
+## Conclusion
+The Router 1×3 successfully routes packets to the selected output FIFO with parity protection, buffering, and FSM-controlled operation.
