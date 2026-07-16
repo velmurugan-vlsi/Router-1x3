@@ -663,7 +663,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 To verify the complete Router 1×3 operation by observing packet reception, destination decoding, FIFO selection, packet buffering, and data transmission through the integrated design.
 
----
 
 ### Signals Observed
 
