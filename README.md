@@ -77,7 +77,6 @@ This project demonstrates key digital design concepts including finite state mac
 
 The Router 1×3 follows a **packet-based communication protocol**, where each packet consists of a **Header**, **Payload**, and **Parity** byte. The header determines the destination output port and the payload length, while the parity byte is used for error detection.
 
----
 
 ## Packet Structure
 
@@ -96,7 +95,6 @@ The packet is transmitted in the following order:
 2. Payload
 3. Parity
 
----
 
 ## Header Format
 
@@ -120,7 +118,6 @@ The packet is transmitted in the following order:
 
 The Synchronizer decodes the destination address and enables the corresponding FIFO.
 
----
 
 ### Payload Length
 
@@ -131,7 +128,6 @@ The Synchronizer decodes the destination address and enables the corresponding F
 
 The FSM uses this field to determine when payload reception is complete and when the parity byte should be received.
 
----
 
 ## Payload
 
@@ -141,7 +137,6 @@ The payload contains the actual data to be transmitted.
 - Stored in the selected FIFO
 - Routed without modification
 
----
 
 ## Parity Byte
 
@@ -157,7 +152,6 @@ Parity = Header
 
 The Register module compares the received parity byte with the internally generated parity. If both values do not match, the **err** signal is asserted.
 
----
 
 ## Example Packet
 
@@ -222,8 +216,6 @@ The **Top Module** integrates the FSM, Register, Synchronizer, and three FIFOs i
 - FIFO1
 - FIFO2
 
----
-
 ## Inputs
 
 | Signal | Description |
@@ -236,7 +228,6 @@ The **Top Module** integrates the FSM, Register, Synchronizer, and three FIFOs i
 | `read_enb_1` | FIFO1 read enable |
 | `read_enb_2` | FIFO2 read enable |
 
----
 
 ## Outputs
 
@@ -256,7 +247,6 @@ The **Top Module** integrates the FSM, Register, Synchronizer, and three FIFOs i
 
 The **Finite State Machine (FSM)** is the controller of the Router 1×3. It controls the complete packet routing sequence by generating the control signals required for packet reception, FIFO management, parity processing, and packet completion. Based on the packet status and FIFO conditions, the FSM transitions through a series of predefined states to ensure correct packet routing.
 
----
 
 ## Responsibilities
 
@@ -269,7 +259,6 @@ The **Finite State Machine (FSM)** is the controller of the Router 1×3. It cont
 - Detect packet completion.
 - Return the router to the idle state.
 
----
 
 ## FSM State Diagram
 
@@ -281,7 +270,6 @@ The **Finite State Machine (FSM)** is the controller of the Router 1×3. It cont
 <b>Figure 2.</b> FSM State Diagram
 </p>
 
----
 
 ## FSM States
 
@@ -291,7 +279,6 @@ The router remains in the idle state until a valid packet is detected. The desti
 
 **Next State:** `LOAD_FIRST_DATA`
 
----
 
 ### LOAD_FIRST_DATA
 
@@ -299,7 +286,6 @@ Receives the packet header, initializes packet reception, and enables writing to
 
 **Next State:** `LOAD_DATA`
 
----
 
 ### LOAD_DATA
 
@@ -310,7 +296,6 @@ Receives payload bytes and continuously writes them into the selected FIFO while
 - `LOAD_PARITY`
 - `FIFO_FULL_STATE`
 
----
 
 ### FIFO_FULL_STATE
 
@@ -318,7 +303,6 @@ Entered whenever the selected FIFO becomes full during packet reception. Packet 
 
 **Next State:** `LOAD_AFTER_FULL`
 
----
 
 ### LOAD_AFTER_FULL
 
@@ -329,7 +313,6 @@ Resumes packet transmission after the FIFO is no longer full and continues writi
 - `LOAD_DATA`
 - `LOAD_PARITY`
 
----
 
 ### LOAD_PARITY
 
@@ -337,7 +320,6 @@ Receives the parity byte after all payload bytes have been transferred.
 
 **Next State:** `CHECK_PARITY_ERROR`
 
----
 
 ### CHECK_PARITY_ERROR
 
@@ -345,7 +327,6 @@ Compares the internally generated parity with the received parity byte. If both 
 
 **Next State:** `DETECT_ADDRESS`
 
----
 
 ## FSM Inputs
 
@@ -359,7 +340,6 @@ Compares the internally generated parity with the received parity byte. If both 
 | `parity_done` | Indicates parity completion |
 | `low_pkt_valid` | Indicates last payload byte |
 
----
 
 ## FSM Outputs
 
@@ -373,7 +353,6 @@ Compares the internally generated parity with the received parity byte. If both 
 | `write_enb_reg` | FIFO write enable control |
 | `rst_int_reg` | Internal register reset |
 
----
 
 ## State Transition Summary
 
@@ -394,7 +373,6 @@ The FSM ensures that every packet follows the correct routing sequence while coo
 
 The **Register Module** forms the primary data path of the Router 1×3. It receives every incoming packet byte and is responsible for storing the header, forwarding payload data, generating internal parity, and verifying the received parity byte. It also temporarily buffers data whenever the selected FIFO becomes full, ensuring that no packet data is lost during transmission.
 
----
 
 ## Responsibilities
 
@@ -406,7 +384,6 @@ The **Register Module** forms the primary data path of the Router 1×3. It recei
 - Buffer data during FIFO full conditions.
 - Generate packet status signals.
 
----
 
 ## Internal Registers
 
@@ -417,7 +394,6 @@ The **Register Module** forms the primary data path of the Router 1×3. It recei
 | `internal_parity_reg` | Generates parity during packet reception |
 | `parity_reg` | Stores the received parity byte |
 
----
 
 ## Important Signals
 
@@ -430,7 +406,6 @@ The **Register Module** forms the primary data path of the Router 1×3. It recei
 
 The Register module acts as the bridge between the packet input interface and the FIFO, ensuring correct packet formatting and parity verification before data is written to the selected output buffer.
 
----
 
 # Synchronizer Module
 
@@ -438,7 +413,6 @@ The **Synchronizer Module** connects the controller with the three output FIFOs.
 
 Only one FIFO is enabled during a packet transfer, ensuring that packets are routed to the correct destination.
 
----
 
 ## Responsibilities
 
@@ -449,7 +423,6 @@ Only one FIFO is enabled during a packet transfer, ensuring that packets are rou
 - Generate valid output signals.
 - Generate independent soft reset signals.
 
----
 
 ## Destination Selection
 
@@ -459,7 +432,6 @@ Only one FIFO is enabled during a packet transfer, ensuring that packets are rou
 | `01` | FIFO1 |
 | `10` | FIFO2 |
 
----
 
 ## Important Signals
 
@@ -482,7 +454,6 @@ The Synchronizer ensures proper communication between the controller and the out
 
 The Router 1×3 contains **three independent FIFOs**, one for each output port. These FIFOs temporarily store packet data before it is transferred to the corresponding output interface. Each FIFO operates independently, allowing packets destined for different output ports to be buffered simultaneously.
 
----
 
 ## Responsibilities
 
@@ -492,7 +463,6 @@ The Router 1×3 contains **three independent FIFOs**, one for each output port. 
 - Generate full and empty status flags.
 - Support soft reset operation.
 
----
 
 ## FIFO Specifications
 
@@ -506,7 +476,6 @@ The Router 1×3 contains **three independent FIFOs**, one for each output port. 
 | Reset | Active-Low Synchronous |
 | Soft Reset | Supported |
 
----
 
 ## Internal Components
 
@@ -519,7 +488,6 @@ The Router 1×3 contains **three independent FIFOs**, one for each output port. 
 | Full Flag | Indicates FIFO is full |
 | Empty Flag | Indicates FIFO is empty |
 
----
 
 ## FIFO Operation
 
@@ -550,7 +518,6 @@ The Router 1×3 design was synthesized using **Intel Quartus Prime**, and the ge
 <b>Figure 3.</b> RTL Viewer of Router 1×3
 </p>
 
----
 
 ## RTL Hierarchy
 
@@ -566,7 +533,6 @@ The synthesized RTL contains the following modules:
 
 Each module performs a dedicated function while working together to achieve complete packet routing.
 
----
 
 ## RTL Observation
 
@@ -583,7 +549,6 @@ The RTL Viewer verifies the following:
 
 Simulation was performed using **ModelSim**. Each module was verified independently through waveform analysis before validating the complete Router 1×3 at the top level. The simulation confirms the correct interaction between all modules and successful packet routing.
 
----
 
 # FIFO Waveform Analysis
 
@@ -601,7 +566,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 **Result:** FIFO functionality verified successfully.
 
----
 
 # FSM Waveform Analysis
 
@@ -620,7 +584,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 **Result:** FSM operation verified successfully.
 
----
 
 # Register Waveform Analysis
 
@@ -639,7 +602,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 **Result:** Register module verified successfully.
 
----
 
 # Synchronizer Waveform Analysis
 
@@ -657,7 +619,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 **Result:** Synchronizer module verified successfully.
 
----
 
 # Top-Level Waveform Analysis (Normal Case)
 
@@ -676,7 +637,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 **Result:** Normal packet routing verified successfully.
 
----
 
 # Top-Level Waveform Analysis (Corner Cases)
 
