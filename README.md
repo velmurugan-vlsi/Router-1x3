@@ -186,13 +186,8 @@ Parity Byte
 
 The Router 1×3 is implemented using a modular Register Transfer Level (RTL) architecture. The design consists of four major functional blocks: the **FSM**, **Register**, **Synchronizer**, and **three independent FIFOs**. Together, these modules receive an incoming packet, decode its destination address, buffer the packet, and forward it to the appropriate output port.
 
-<p align="center">
-<img src="Images/router_architecture.png" width="900">
-</p>
+<img width="718" height="499" alt="Screenshot 2026-07-13 151201" src="https://github.com/user-attachments/assets/15ebf490-5cd5-4c75-9f7b-c16fca16e2b7" />
 
-<p align="center">
-<b>Figure 1.</b> Router 1×3 Architecture
-</p>
 
 The architecture is divided into two logical sections:
 
