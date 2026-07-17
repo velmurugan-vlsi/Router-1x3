@@ -152,7 +152,8 @@ packet(8'hF2);   // Payload16  <-- FIFO should become FULL here
 pkt_valid = 1'b0;
 packet(8'hBE);   // Parity
 read2;
-//test4
+
+//test4 payload length=1
 init;
 rst;
 pkt_valid=1'b1;
@@ -162,11 +163,69 @@ packet(8'h01);
 pkt_valid=1'b0;
 packet(8'h04);
 read_enb_2=1'b1;
-    repeat(3)
+    repeat(4)
     @(posedge clock);
     read_enb_2=1'b0;
     @(posedge clock);
 
+//test5 Packet to all three FIFOs
+// FIFO0
+init;
+rst;
+pkt_valid = 1;
+header(8'h08);
+@(posedge clock);
+packet(8'hAA);
+packet(8'hBB);
+pkt_valid = 0;
+packet(8'h19);
+
+@(posedge clock);     // Give router one clock to return to DECODE_ADDRESS
+
+// FIFO1
+pkt_valid = 1;
+header(8'h09);
+@(posedge clock);
+packet(8'h11);
+packet(8'h22);
+pkt_valid = 0;
+packet(8'h38);
+
+@(posedge clock);     // Again one clock gap
+
+// FIFO2
+pkt_valid = 1;
+header(8'h0A);
+@(posedge clock);
+packet(8'h33);
+packet(8'h44);
+pkt_valid = 0;
+packet(8'h79);
+
+@(posedge clock);
+
+read0;
+read1;
+read2;
+
+//test 6 Read from the wrong FIFO
+init;
+rst;
+
+pkt_valid = 1;
+header(8'h06);   // DA = 2
+
+@(posedge clock);
+packet(8'hAA);
+
+pkt_valid = 0;
+packet(8'hAC);
+
+// Wrong FIFO
+read0;
+
+// Correct FIFO
+read2;
     #1000 $finish;
 end
 
