@@ -166,7 +166,6 @@ read_enb_2=1'b1;
     @(posedge clock);
     read_enb_2=1'b0;
     @(posedge clock);
-//test5
 
     #1000 $finish;
 end
