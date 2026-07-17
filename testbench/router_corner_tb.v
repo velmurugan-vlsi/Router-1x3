@@ -106,32 +106,28 @@ rst;
 
 //Packet 1
 pkt_valid = 1'b1;
-header(8'h10);          // Length=4, DA=00 (FIFO0)
+header(8'h10);  // Length=4, DA=00 (FIFO0)
 @(posedge clock);
-
 packet(8'hAA);
 packet(8'h55);
 packet(8'hF0);
 packet(8'h0F);
-
 pkt_valid = 1'b0;
-packet(8'h10);          // Parity
+packet(8'h10);  // Parity
 @(posedge clock);
 @(posedge clock);
+
 //packet 2 
 pkt_valid = 1'b1;
-header(8'h10);          // Same DA=00 (FIFO0)
+header(8'h10);  
 @(posedge clock);
-
 packet(8'h11);
 packet(8'h22);
 packet(8'h33);
 packet(8'h44);
-
 pkt_valid = 1'b0;
-packet(8'h44);          // Example parity (replace with correct parity)
+packet(8'h44);     
 
-// Don't read until BOTH packets are stored
 repeat(3)
     @(posedge clock);
 
@@ -142,73 +138,45 @@ read0;
     init;
     rst;
     pkt_valid = 1'b1;
-header(8'h42);   // Header : Length=15 (16 payload bytes), DA=2
-@(posedge clock);
-packet(8'h11);   // Payload1
-packet(8'h22);   // Payload2
-packet(8'h33);   // Payload3
-packet(8'h44);   // Payload4
-packet(8'h55);   // Payload5
-packet(8'h66);   // Payload6
-packet(8'h77);   // Payload7
-packet(8'h88);   // Payload8
-packet(8'h99);   // Payload9
-packet(8'hAA);   // Payload10
-packet(8'hBB);   // Payload11
-packet(8'hCC);   // Payload12
-packet(8'hDD);   // Payload13
-packet(8'hEE);   // Payload14
-packet(8'hF1);   // Payload15
+header(8'h42);   // Header
+packet(8'h11);   
+packet(8'h22);  
+packet(8'h33);  
+packet(8'h44);  
+packet(8'h55);  
+packet(8'h66);  
+packet(8'h77);   
+packet(8'h88); 
+packet(8'h99);   
+packet(8'hAA);   
+packet(8'hBB);   
+packet(8'hCC);   
+packet(8'hDD);   
+packet(8'hEE);  
+packet(8'hF1);   
 packet(8'hF2);   // Payload16  <-- FIFO should become FULL here and these not include
 rst;
 pkt_valid = 1'b0;
-packet(8'hBE);   // Parity (example)
+packet(8'hBE);   // Parity
 read2;
-//test3 full test with reset
-    init;
-    rst;
-    pkt_valid = 1'b1;
-header(8'h42);   // Header : Length=15 (16 payload bytes), DA=2
-@(posedge clock);
-packet(8'h11);   // Payload1
-packet(8'h22);   // Payload2
-packet(8'h33);   // Payload3
-packet(8'h44);   // Payload4
-packet(8'h55);   // Payload5
-packet(8'h66);   // Payload6
-packet(8'h77);   // Payload7
-packet(8'h88);   // Payload8
-packet(8'h99);   // Payload9
-packet(8'hAA);   // Payload10
-packet(8'hBB);   // Payload11
-packet(8'hCC);   // Payload12
-packet(8'hF1);   // Payload15
-packet(8'hF2);   // Payload16  <-- FIFO should become FULL here and these not include
-pkt_valid = 1'b0;
-packet(8'hBE);   // Parity (example)
-read2;
+
+
 //test intentinally give pkt_valid glitch
+
 init;
 rst;
-
-// Header
 pkt_valid = 1;
 header(8'h10);
 @(posedge clock);
-
-// Payload1
 packet(8'hAA);
-
-// ---------- Illegal ----------
+// Illegal
 pkt_valid = 0;
 packet(8'h55);
-
-// Continue packet (illegal)
 pkt_valid = 1;
 packet(8'hF0);
-
 pkt_valid = 0;
 packet(8'h4D); // parity
+
 //test - during empty time give write 
 init;
 rst;
@@ -217,10 +185,10 @@ header(8'h10);
 @(posedge clock);
 packet(8'hAA);
 packet(8'h55);
-
 pkt_valid = 0;
 packet(8'hEF);
 read_enb_0 = 1;
+
 pkt_valid = 1;
 header(8'h10);
 packet(8'h11);
