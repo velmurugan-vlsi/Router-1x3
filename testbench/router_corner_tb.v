@@ -154,7 +154,7 @@ packet(8'hCC);
 packet(8'hDD);   
 packet(8'hEE);  
 packet(8'hF1);   
-    packet(8'hF2);   // Payload16  <-- FIFO should become FULL here and these payload not include store in fifo_full_reg
+packet(8'hF2);   // Payload16  <-- FIFO should become FULL here and these not include
 rst;
 pkt_valid = 1'b0;
 packet(8'hBE);   // Parity
@@ -196,6 +196,25 @@ packet(8'h22);
 
 pkt_valid = 0;
 packet(8'h33);
+
+//test - Read exactly on timeout boundary
+init;
+rst;
+
+pkt_valid=1;
+header(8'h06);
+
+@(posedge clock);
+
+packet(8'hAA);
+
+pkt_valid=0;
+packet(8'hAC);
+
+    repeat(26)       //this reaches upto count of 29 
+@(posedge clock);
+
+read2;
     #2000 $finish;
 end
 
