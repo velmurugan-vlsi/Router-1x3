@@ -553,9 +553,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # FIFO Waveform Analysis
 
-<p align="center">
-<img src="waveforms/fifo/fifo_waveform.png" width="900">
-</p>
 
 ### Verified
 
@@ -570,9 +567,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # FSM Waveform Analysis
 
-<p align="center">
-<img src="waveforms/fsm/fsm_waveform.png" width="900">
-</p>
 
 ### Verified
 
@@ -588,10 +582,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # Register Waveform Analysis
 
-<p align="center">
-<img src="waveforms/register/register_waveform.png" width="900">
-</p>
-
 ### Verified
 
 - Header storage
@@ -606,9 +596,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # Synchronizer Waveform Analysis
 
-<p align="center">
-<img src="waveforms/synchronizer/synchronizer_waveform.png" width="900">
-</p>
 
 ### Verified
 
@@ -623,9 +610,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # Top-Level Waveform Analysis (Normal Case)
 
-<p align="center">
-<img src="waveforms/router/router_normal_case.png" width="900">
-</p>
 
 ### Verified
 
@@ -641,9 +625,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 
 # Top-Level Waveform Analysis (Corner Cases)
 
-<p align="center">
-<img src="waveforms/router/router_corner_case.png" width="900">
-</p>
 
 ### Verified
 
@@ -656,9 +637,6 @@ Simulation was performed using **ModelSim**. Each module was verified independen
 **Result:** Corner case behavior verified successfully.
 # Top-Level Waveform Analysis (Normal Case)
 
-<p align="center">
-<img src="Waveforms/top_level_normal.png" width="900">
-</p>
 
 ### Objective
 
@@ -702,9 +680,6 @@ The waveform confirms the following operations:
 
 # Top-Level Waveform Analysis (Corner Cases)
 
-<p align="center">
-<img src="Waveforms/top_level_corner_case.png" width="900">
-</p>
 
 ### Objective
 
