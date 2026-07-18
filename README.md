@@ -719,25 +719,11 @@ The Router 1×3 design was verified through **ModelSim waveform analysis**. Indi
 
 ---
 
-# Repository Structure
-
-```text
-Router-1x3/
-│
-├── RTL/                 # Verilog source files
-├── Testbench/           # Testbench files
-├── Waveforms/           # ModelSim waveform screenshots
-├── RTL_Viewer/          # Quartus RTL Viewer images
-├── Images/              # Architecture and FSM diagrams
-├── README.md
-└── LICENSE
-```
-
----
-
 # Author
 
 **VELMURUGAN R**
+**Electrical Electronics Engineering**
+**Bannari Amman Institute Of Technology**
 
 ---
 
