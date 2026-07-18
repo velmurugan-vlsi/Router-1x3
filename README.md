@@ -186,8 +186,13 @@ Parity Byte
 
 The Router 1×3 is implemented using a modular Register Transfer Level (RTL) architecture. The design consists of four major functional blocks: the **FSM**, **Register**, **Synchronizer**, and **three independent FIFOs**. Together, these modules receive an incoming packet, decode its destination address, buffer the packet, and forward it to the appropriate output port.
 
+<p align="center">
 <img width="718" height="499" alt="Screenshot 2026-07-13 151201" src="https://github.com/user-attachments/assets/15ebf490-5cd5-4c75-9f7b-c16fca16e2b7" />
+</p>
 
+<p align="center">
+<b>Figure 1.</b> Router 1×3 Architecture
+</p>
 
 The architecture is divided into two logical sections:
 
@@ -506,7 +511,8 @@ The independent FIFO architecture allows each output port to buffer packets sepa
 The Router 1×3 design was synthesized using **Intel Quartus Prime**, and the generated **RTL Viewer** was used to verify the structural implementation of the design. The RTL hierarchy confirms that the router is implemented using a modular architecture consisting of the **FSM**, **Register**, **Synchronizer**, and **three independent FIFO modules**.
 
 <p align="center">
-<img src="rtl/rtl_viewer.png" width="900">
+<img width="929" height="452" alt="Screenshot 2026-07-15 112554" src="https://github.com/user-attachments/assets/ee2f28d0-4d3a-4808-b902-44f173c1137e" />
+
 </p>
 
 <p align="center">
