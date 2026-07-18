@@ -722,11 +722,14 @@ The Router 1×3 design was verified through **ModelSim waveform analysis**. Indi
 # Author
 
  **VELMURUGAN R**
- **Aspiring VLSI Design & Verification Engineer**
  
- **Electrical Electronics Engineering**
+ B.E. Electrical and Electronics Engineering  
+Aspiring VLSI Design & Verification Engineer
+
+**Bannari Amman Institute Of Technology**
+
+[LinkedIn](linkedin.com/in/velmurugan-r-43b0b2355)
  
- **Bannari Amman Institute Of Technology**
 
 ---
 
