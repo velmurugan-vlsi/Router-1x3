@@ -263,7 +263,7 @@ The **Finite State Machine (FSM)** is the controller of the Router 1×3. It cont
 ## FSM State Diagram
 
 <p align="center">
-<img src="Images/fsm_diagram.png" width="700">
+<img width="629" height="383" alt="Screenshot 2026-07-18 154935" src="https://github.com/user-attachments/assets/bec4af5c-cfb2-4313-b858-d99cc126dfc3" />
 </p>
 
 <p align="center">
